@@ -1,5 +1,8 @@
 import main as pyspotui_actions
 
+# NOT WORKING CORRECTLY!!! DO NOT USE YET
+spotifyd_using_brew = False # KEEP DISABLED FOR NOW, IT IS NOT WORKING CORRECTLY
+
 class home:
     titel = "Startpage"
     exittext = "Zie je later!"
