@@ -14,11 +14,9 @@ def startpage(firstRun=False):
     playing = playback.get_current_playback()
     if playing:
         options = [
-            {'name': "currently playing", 'function': playback_menu},
-            {'name': "playlists", 'function': playlist_menu},
-            "albums",
-            "tracks",
-            "artists",
+            {'name': conf.home.currentlyplaying, 'function': playback_menu},
+            {'name': conf.home.playlist, 'function': playlist_menu},
+            {'name':conf.home.artists, 'function': artists_menu},
             {'name': "exit", 'function': lambda: (clear(), print(conf.home.exittext), exit(0))},
         ]
         startpage_menu = UI(options, REALhotkeys,conf.home.lijstStartText, conf.home.askForInputText)
@@ -35,7 +33,7 @@ def playlist_menu():
     header(conf.playlist_menu.header)
     playlists = library.user_playlists()
     playlistAsOptions = [
-        {'name': 'back', 'function': startpage},    
+        {'name':conf.generic.back, 'function': startpage},    
     ]
     log(playlists['items'])
     if playlists and 'items' in playlists:
@@ -148,6 +146,49 @@ def playback_menu():
     # playback_menu_ui.display_menu()
     playback_menu_ui.get_user_choice_and_run()
 
+def artists_menu():
+    clear()
+    header(conf.artists_menu.header)
+    artists = library.saved_artists()
+    artistAsOptions = [
+        {'name': conf.generic.back, 'function': startpage},
+    ]
+    if artists and 'artists' in artists:
+        for artist in artists['artists']['items']:
+            artistAsOptions.append({
+                'name': artist['name'],
+                'function': lambda a=artist: (artist_submenu(a['uri']))
+            })
+
+    artist_menu_ui = UI(artistAsOptions, REALhotkeys, conf.artists_menu.lijstStartText, conf.artists_menu.askForInputText)
+    artist_menu_ui.display_menu()
+    artist_menu_ui.get_user_choice_and_run()
+
+def artist_submenu(artist_id):
+    clear()
+    artist = library.get_artist(artist_id)
+    artistTT = library.get_artist_top_tracks(uri=artist_id)
+    log('ARTIST START. '+str(artist))
+    header(conf.artist_submenu.header.replace('$name', artist['name']))
+    if conf.artist_submenu.moreInfo:
+        rich.print(f"Followers: {artist['followers']['total']}")
+        rich.print(f"Genres: {', '.join(artist['genres'])}")
+        rich.print(f"Popularity: {artist['popularity']}")
+    options = [
+        {'name': conf.generic.back, 'function': artists_menu},
+    ]
+    if artistTT and 'tracks' in artistTT:
+        for track in artistTT['tracks']:
+            options.append({
+                'name': f"{track['name']} - {', '.join(artist['name'] for artist in track['artists'])}",
+                'function': lambda t=track: (playback.add_to_queue(t['uri']), playback_menu())
+            })
+    else:
+        rich.print("No top tracks found for this artist.")
+    
+    artist_submenu_ui = UI(options, REALhotkeys, conf.artist_submenu.lijstStartText, conf.artist_submenu.askForInputText)
+    artist_submenu_ui.display_menu()
+    artist_submenu_ui.get_user_choice_and_run()
 
 if __name__ == "__main__":
     clear()
@@ -157,6 +198,8 @@ if __name__ == "__main__":
         {'name': 'startpage', 'function': startpage},
         {'name': 'playlists', 'function': playlist_menu},
         {'name': 'currently_playing', 'function': playback_menu},
+        {'name': 'artists', 'function': artists_menu},
+        {'name': 'exit', 'function': lambda: (clear(), print(conf.home.exittext), exit(0))}
     ])
     clear()
     rich.print(

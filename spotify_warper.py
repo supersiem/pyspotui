@@ -2,7 +2,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 class SpotifyWarper:
-    def __init__(self, client_id, client_secret, redirect_uri, scope='user-read-playback-state,user-modify-playback-state,user-library-read'):
+    def __init__(self, client_id, client_secret, redirect_uri, scope='user-read-playback-state,user-modify-playback-state,user-library-read,user-library-modify,playlist-read-private,playlist-modify-private,playlist-modify-public,playlist-read-collaborative,user-read-private,user-follow-read'):
         self.sp = spotipy.Spotify(client_credentials_manager=SpotifyOAuth(scope=scope, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri))
 
     def get_devices(self):
@@ -67,6 +67,12 @@ class SpotifyWarper:
             return self.sp.current_user_playlists(limit=limit)
         def user_playlists(self, limit=20):
             return self.sp.current_user_playlists(limit=limit)
+        
+        def get_artist(self, uri):
+            return self.sp.artist(uri)
+        
+        def get_artist_top_tracks(self, uri):
+            return self.sp.artist_top_tracks(uri)
 
         def get_album(self, uri):
             return self.sp.album(uri)

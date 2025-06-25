@@ -3,14 +3,28 @@ import main as pyspotui_actions
 class home:
     titel = "Startpage"
     exittext = "Zie je later!"
+    currentlyplaying = "Currently playing"
     noSesion = "No playback session found. Please start a playback session first."
+    lijstStartText = "Wat wil je doen?"
+    askForInputText = "Kies een optie: "
+    playlist = "Playlists"
+    artists = "Artists"
+
+class artists_menu:
+    header = "Artists"
+    lijstStartText = "Kies de artiest die je wilt bekijken of afspelen:"
+    askForInputText = "Kies een artiest: "
+
+class artist_submenu:
+    moreInfo = False
+    header = "$name"
     lijstStartText = "Wat wil je doen?"
     askForInputText = "Kies een optie: "
 
 class playlist_menu:
     header = "Playlists"
-    lijstStartText = "Wat wil je doen?"
-    askForInputText = "Kies een optie: "
+    lijstStartText = "Welk lied wil je spelen?"
+    askForInputText = "Kies een lied: "
 
 class playlist_submenu:
     header = "Playlist opties"
@@ -58,4 +72,6 @@ keybinds = [
     {'combo': 'h', 'action': 'startpage'},
     {'combo': 'c', 'action': 'currently_playing'},
     {'combo': 'p', 'action': 'playlists'},
+    {'combo': 'a', 'action': 'artists'},
+    {'combo': 'q', 'action': 'exit'},
 ]
