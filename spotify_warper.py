@@ -40,6 +40,22 @@ class SpotifyWarper:
         def play_pause(self):
             return self.sp.pause_playback() if self.get_current_playback()['is_playing'] else self.sp.start_playback()
     
+    class search:
+        def __init__(self, spotify_warper, device_id=None):
+            self.sp = spotify_warper.sp
+
+        def search_songs(self, query, limit=20):
+            return self.sp.search(q=query, type='track', limit=limit)
+        
+        def search_albums(self, query, limit=20):
+            return self.sp.search(q=query, type='album', limit=limit)
+        
+        def search_artists(self, query, limit=20):
+            return self.sp.search(q=query, type='artist', limit=limit)
+        
+        def search_playlists(self, query, limit=20):
+            return self.sp.search(q=query, type='playlist', limit=limit)
+
     class Library:
         def __init__(self, spotify_warper, device_id=None):
             self.sp = spotify_warper.sp

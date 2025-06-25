@@ -17,6 +17,7 @@ def startpage(firstRun=False):
             {'name': conf.home.currentlyplaying, 'function': playback_menu},
             {'name': conf.home.playlist, 'function': playlist_menu},
             {'name':conf.home.artists, 'function': artists_menu},
+            {'name': conf.generic.search, 'function': search_menu},
             {'name': "exit", 'function': lambda: (clear(), print(conf.home.exittext), exit(0))},
         ]
         startpage_menu = UI(options, REALhotkeys,conf.home.lijstStartText, conf.home.askForInputText)
@@ -27,6 +28,63 @@ def startpage(firstRun=False):
             conf.home.noSesion
         )
 
+def search_menu():
+    clear()
+    header(conf.search_menu.header)
+    search_options = [
+        {'name': conf.generic.back, 'function': startpage},
+        {'name': conf.search_menu.songs, 'function': lambda: search_menus.songs(query=input(conf.search.askForInputText))},
+        {'name': conf.search_menu.playlists, 'function': lambda: search_menus.playlists(query=input(conf.search.askForInputText))},
+    ]
+    
+    search_menu_ui = UI(search_options, REALhotkeys, conf.search_menu.lijstStartText, conf.search_menu.askForQueryText)
+    search_menu_ui.display_menu()
+    search_menu_ui.get_user_choice_and_run()
+
+class search_menus:
+    def songs(query):
+        clear()
+        header(conf.search.header.replace('$query', query))
+        options = [
+            {'name': conf.generic.back, 'function': search_menu},
+        ]
+        results = search.search_songs(query)
+        log(results)
+        if results and 'tracks' in results and results['tracks']['items']:
+            for track in results['tracks']['items']:
+                options.append({
+                    'name': f"{track['name']} - {', '.join(artist['name'] for artist in track['artists'])}",
+                    'function': lambda t=track: (playback.add_to_queue(t['uri']), playback_menu())
+                })
+            
+            search_menu_ui = UI(options, REALhotkeys, conf.search.lijstStartText, conf.search.askForInputText)
+            search_menu_ui.display_menu()
+            search_menu_ui.get_user_choice_and_run()
+        else:
+            rich.print(conf.search.no_results)
+    
+    def playlists(query):
+        clear()
+        header(conf.search.header.replace('$query', query))
+        options = [
+            {'name': conf.generic.back, 'function': search_menu},
+        ]
+        results = search.search_playlists(query)
+        log(results)
+        if results and 'playlists' in results and results['playlists']['items']:
+            for playlist in results['playlists']['items']:
+                if playlist and 'name' in playlist and 'uri' in playlist:  # Check if playlist is not None and has required fields
+                    options.append({
+                        'name': playlist['name'],
+                        'function': lambda p=playlist: (playlist_submenu(p['uri'], isFromSearch=True))
+                    })
+            
+            search_menu_ui = UI(options, REALhotkeys, conf.search.lijstStartText, conf.search.askForInputText)
+            search_menu_ui.display_menu()
+            search_menu_ui.get_user_choice_and_run()
+        else:
+            rich.print(conf.search.no_results)
+        
 
 def playlist_menu():
     clear()
@@ -49,37 +107,42 @@ def playlist_menu():
     playlist_menu_ui.display_menu()
     playlist_menu_ui.get_user_choice_and_run()
 
-def playlist_submenu(uri):
+def playlist_submenu(uri, isFromSearch=False):
     clear()
     playlist = library.get_playlist(uri)
     header(playlist['name'])
     options = [
         {'name': conf.generic.play, 'function': lambda: (playback.play_playlist(uri), playback_menu())},
-        {'name': conf.playlist_submenu.view, 'function': lambda: (view_playlist_tracks(uri), playlist_menu(uri))},
-        {'name': conf.generic.back, 'function': playlist_menu}
+        {'name': conf.playlist_submenu.view, 'function': lambda: (view_playlist_tracks(uri, isFromSearch), playlist_menu(uri))},
     ]
+    if not isFromSearch:
+        options.append({'name': conf.generic.back, 'function': playlist_menu})
+    else:
+        options.append({'name': conf.home.titel, 'function': lambda: (startpage())})
     playlistUI = UI(options,REALhotkeys, conf.playlist_submenu.lijstStartText, conf.playlist_submenu.askForInputText)
     playlistUI.display_menu()
     playlistUI.get_user_choice_and_run()
 
-def view_playlist_tracks(playlist_id):
+def view_playlist_tracks(playlist_id, isFromSearch=False):
     clear()
     playlist = library.get_playlist(playlist_id)
     header(conf.playlist_tracks.header.replace('%name', playlist['name']))
     options = [
-        {'name': 'placeholder A', 'function': showplaylistOption(playlist)}
+        {'name': 'placeholder A', 'function': showplaylistOption(playlist, isFromSearch)}
     ]
     playlistUI = UI(options,REALhotkeys, conf.playlist_tracks.lijstStartText, conf.playlist_tracks.askForInputText)
     playlistUI.display_menu()
     playlistUI.get_user_choice_and_run()
 
-def showplaylistOption(playlist):
+def showplaylistOption(playlist, isFromSearch=False):
     clear()
     header(playlist['name'])
     rich.print(f"Owner: {playlist['owner']['display_name']}")
     rich.print(f"Description: {playlist['description']}")
     rich.print(f"Total tracks: {playlist['tracks']['total']}")
-    options = []
+    options = [
+        {'name': conf.generic.back, 'function': lambda: (playlist_submenu(playlist['uri'], isFromSearch))},
+    ]
     for track in playlist['tracks']['items']:
         options.append({
             'name': f"{track['track']['name']} - {', '.join(artist['name'] for artist in track['track']['artists'])}",
@@ -193,12 +256,17 @@ def artist_submenu(artist_id):
 if __name__ == "__main__":
     clear()
     rich.print("Loading...")
-    spotify = spotifylib.SpotifyWarper(SECRETS.CLIENT_ID, SECRETS.CLIENT_SECRET, SECRETS.REDIRECT_URI); playback = spotify.Playback(spotify); library = spotify.Library(spotify);
+    spotify = spotifylib.SpotifyWarper(SECRETS.CLIENT_ID, SECRETS.CLIENT_SECRET, SECRETS.REDIRECT_URI); playback = spotify.Playback(spotify); library = spotify.Library(spotify); search = spotify.search(spotify)
     REALhotkeys = hotkey_action_function_matcher(conf.keybinds, actions=[
         {'name': 'startpage', 'function': startpage},
         {'name': 'playlists', 'function': playlist_menu},
         {'name': 'currently_playing', 'function': playback_menu},
         {'name': 'artists', 'function': artists_menu},
+        {'name': 'search', 'function': search_menu},
+        {'name': 'search_songs', 'function': lambda: search_menus.songs(query=input(conf.search_menu.askForQueryText))},
+        # {'name': 'search_albums', 'function': lambda: search_menus.albums(query=input(conf.search_menu.askForQueryText))},
+        # {'name': 'search_artists', 'function': lambda: search_menus.artists(query=input(conf.search_menu.askForQueryText))},
+        {'name': 'search_playlists', 'function': lambda: search_menus.playlists(query=input(conf.search_menu.askForQueryText))},
         {'name': 'exit', 'function': lambda: (clear(), print(conf.home.exittext), exit(0))}
     ])
     clear()

@@ -48,8 +48,8 @@ class playback_menu:
         'progress'
     ]
 
-
 class generic:
+    search = 'zoeken'
     header = "please add a header to this page from the config file"
     startText = 'Choose an option:'
     askForInputText = "Enter your choice: "
@@ -65,6 +65,23 @@ class generic:
     notPlaying = "3: play"
     playing = "3: pause"
 
+class search_menu:
+    askForQueryText = 'Enter your search query: '
+    header = 'Search'
+    songs = 'Songs'
+    albums = 'Albums'
+    artists = 'Artists'
+    playlists = 'Playlists'
+    lijstStartText = 'Hoe wil je zoeken?'
+    askForInputText = 'Kies een optie: '
+
+class search:
+    askForInputText = 'Enter your search query: '
+    header = 'Search results for: $query'
+    no_results = 'No results found for: $query'
+    lijstStartText = 'Dit hebben we gevonden: '
+    askForInputText = 'Kies iets: '
+
 welkome = "Welcome to Spotify Warper! This is a command line interface for Spotify. Enjoy your stay!"
 
 
@@ -74,4 +91,9 @@ keybinds = [
     {'combo': 'p', 'action': 'playlists'},
     {'combo': 'a', 'action': 'artists'},
     {'combo': 'q', 'action': 'exit'},
+    {'combo': 's', 'action': 'search'},
+    {'combo': 'st', 'action': 'search_songs'},
+    # {'combo': 'sa', 'action': 'search_albums'},
+    # {'combo': 'se', 'action': 'search_artists'},
+    {'combo': 'sp', 'action': 'search_playlists'},
 ]
