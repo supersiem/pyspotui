@@ -1,14 +1,11 @@
-import spotify_warper as spotifylib
-import time
 import rich
+import spotify_warper as spotifylib
 import SECRETS
 from helpers import *
 import config as conf
 import requests
 import os
 from pathlib import Path
-import signal
-import sys
 
 def startpage(firstRun=False):
     if not firstRun:
@@ -161,33 +158,8 @@ if __name__ == "__main__":
         {'name': 'playlists', 'function': playlist_menu},
         {'name': 'currently_playing', 'function': playback_menu},
     ])
-    if conf.spotifyd_using_brew:
-        rich.print("THIS FEATURE IS NOT WORKING CORRECTLY YET, PLEASE DISABLE IT IN THE CONFIG FILE")
-        sys.exit(0)
-        # rich.print("Spotifyd is using brew, starting it now...")
-        # os.system('brew services start spotifyd')
-        # time.sleep(2)  # Wait for spotifyd to start
     clear()
     rich.print(
         conf.welkome
     )
     startpage(True)
-
-    # TODO_: fix deze code en uncomment
-    # def cleanup_and_exit(signum, frame):
-    #     if conf.spotifyd_using_brew:
-    #         rich.print("stoping spotifyd...")
-    #         os.system('brew services stop spotifyd')
-    #     sys.exit(0)
-
-    # # Register signal handler for keyboard interrupt
-    # signal.signal(signal.SIGINT, cleanup_and_exit)
-
-    # try:
-    #     startpage(True)
-    # except KeyboardInterrupt:
-    #     cleanup_and_exit(None, None)
-    # finally:
-    #     if conf.spotifyd_using_brew:
-    #         rich.print("stoping spotifyd...")
-    #         os.system('brew services stop spotifyd')
