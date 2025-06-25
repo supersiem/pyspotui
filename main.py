@@ -3,6 +3,9 @@ import spotify_warper as spotifylib
 import SECRETS
 from helpers import *
 import config as conf
+import requests
+import os
+from pathlib import Path
 
 def startpage(firstRun=False):
     if not firstRun:
@@ -94,10 +97,33 @@ def playback_menu():
     clear()
     header(conf.playback_menu.header) 
     playing = playback.get_current_playback()
-    if playing and playing.get('item'):
+    # Create cache directory if it doesn't exist
+    cache_dir = Path.home() / '.config' / 'pyspotui'
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # Get album art URL and cache it
+    if playing and playing['item'] and playing['item']['album']['images']:
+        album_id = playing['item']['album']['id']
+        cache_file = cache_dir / f"{album_id}.jpg"
         
-        output = conf.playback_menu.text.replace('$name', playing['item']['name']).replace('$artists', ', '.join(artist['name'] for artist in playing['item']['artists'])).replace('$album', playing['item']['album']['name']).replace('$duration', str(playing['item']['duration_ms'] // 1000))
-        rich.print(output)
+        if not cache_file.exists():
+            # Download and cache the image
+            images = playing['item']['album']['images']
+            image_url = images[0]['url']
+            try:
+                response = requests.get(image_url)
+                response.raise_for_status()
+                with open(cache_file, 'wb') as f:
+                    f.write(response.content)
+            except requests.RequestException as e:
+                log(f"Failed to download album art: {e}")
+                rich.print("Failed to download album art.")
+    
+    # Display album art if available
+    os.system('timg ' + str(cache_file) if cache_file.exists() else '')
+
+    output = conf.playback_menu.text.replace('$name', playing['item']['name']).replace('$artists', ', '.join(artist['name'] for artist in playing['item']['artists'])).replace('$album', playing['item']['album']['name']).replace('$duration', str(playing['item']['duration_ms'] // 1000))
+    rich.print(output)
         
     # TODO_ fix queue viewing and add volume control
     options = [
