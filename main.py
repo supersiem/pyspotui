@@ -233,7 +233,8 @@ def artist_submenu(artist_id):
     options = [
         {'name': conf.generic.back, 'function': artists_menu},
         {'name': conf.artist_submenu.populair, 'function': lambda: (artist_best_tracks(artist_id))},
-        {'name': conf.artist_submenu.allMusic, 'function': lambda: (view_albums_of_artist(artist_id))}
+        {'name': conf.artist_submenu.allMusic, 'function': lambda: (view_albums_of_artist(artist_id))},
+        {'name': conf.generic.play, 'function': lambda: (playback.play(artist_id), playback_menu())},
     ]
     if conf.artist_submenu.moreInfo:
         options.append({'name': 'More Info', 'function': lambda: (artist_best_tracks(artist_id))})
