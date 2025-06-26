@@ -229,6 +229,59 @@ def artists_menu():
 def artist_submenu(artist_id):
     clear()
     artist = library.get_artist(artist_id)
+    header(conf.artist_submenu.header.replace('$name', artist['name']))
+    options = [
+        {'name': conf.generic.back, 'function': artists_menu},
+        {'name': conf.artist_submenu.populair, 'function': lambda: (artist_best_tracks(artist_id))},
+        {'name': conf.artist_submenu.allMusic, 'function': lambda: (view_albums_of_artist(artist_id))}
+    ]
+    if conf.artist_submenu.moreInfo:
+        options.append({'name': 'More Info', 'function': lambda: (artist_best_tracks(artist_id))})
+
+    artist_submenu_ui = UI(options, REALhotkeys, conf.artist_submenu.lijstStartText, conf.artist_submenu.askForInputText)
+    artist_submenu_ui.display_menu()
+    artist_submenu_ui.get_user_choice_and_run()
+
+def view_albums_of_artist(artist_id):
+    clear()
+    artist = library.get_artist(artist_id)
+    header(conf.artist_submenu.header.replace('$name', artist['name']))
+    options = [
+        {'name': conf.generic.back, 'function': lambda: (artist_submenu(artist_id))},
+    ]
+    albums = library.get_artist_albums(artist_id)
+    log(albums)
+    if albums and 'items' in albums:
+        for album in albums['items']:
+            # Add album type prefix to distinguish between albums, singles, etc.
+            album_type_prefix = ""
+            if album['album_type'] == 'single':
+                album_type_prefix = "[Single] "
+            elif album['album_type'] == 'compilation':
+                album_type_prefix = "[Compilation] "
+            elif album['album_type'] == 'album':
+                album_type_prefix = "[Album] "
+            
+            # Add release year for better identification
+            release_year = album['release_date'][:4] if album.get('release_date') else ""
+            year_suffix = f" ({release_year})" if release_year else ""
+            
+            display_name = f"{album_type_prefix}{album['name']}{year_suffix}"
+            
+            options.append({
+                'name': display_name,
+                'function': lambda a=album: (album_submenu(a['uri']))
+            })
+    else:
+        rich.print("No albums found for this artist.")
+
+    view_albums_ui = UI(options, REALhotkeys, conf.artist_submenu.lijstStartText, conf.artist_submenu.askForInputText)
+    view_albums_ui.display_menu()
+    view_albums_ui.get_user_choice_and_run()
+
+def artist_best_tracks(artist_id):
+    clear()
+    artist = library.get_artist(artist_id)
     artistTT = library.get_artist_top_tracks(uri=artist_id)
     log('ARTIST START. '+str(artist))
     header(conf.artist_submenu.header.replace('$name', artist['name']))
@@ -251,6 +304,36 @@ def artist_submenu(artist_id):
     artist_submenu_ui = UI(options, REALhotkeys, conf.artist_submenu.lijstStartText, conf.artist_submenu.askForInputText)
     artist_submenu_ui.display_menu()
     artist_submenu_ui.get_user_choice_and_run()
+
+def view_album_tracks(album_id):
+    clear()
+    album = library.get_album(album_id)
+    header(conf.album_tracks.header.replace('%name', album['name']))
+    options = [
+        {'name': conf.generic.back, 'function': lambda: (album_submenu(album_id))},
+    ]
+    for track in album['tracks']['items']:
+        options.append({
+            'name': f"{track['name']} - {', '.join(artist['name'] for artist in track['artists'])}",
+            'function': lambda t=track: (playback.add_to_queue(t['uri']), playback_menu())
+        })
+
+    view_album_tracks_ui = UI(options, REALhotkeys, conf.album_tracks.lijstStartText, conf.album_tracks.askForInputText)
+    view_album_tracks_ui.display_menu()
+    view_album_tracks_ui.get_user_choice_and_run()
+
+def album_submenu(album_id):
+    clear()
+    album = library.get_album(album_id)
+    header(conf.album_tracks.header.replace('$name', album['name']))
+    options = [
+        {'name': conf.generic.back, 'function': artists_menu},
+        {'name': conf.generic.play, 'function': lambda: (playback.play(album_id), playback_menu())},
+        {'name': conf.playlist_submenu.view, 'function': lambda: (view_album_tracks(album_id))}
+    ]
+    album_submenu_ui = UI(options, REALhotkeys, conf.album_tracks.lijstStartText, conf.album_tracks.askForInputText)
+    album_submenu_ui.display_menu()
+    album_submenu_ui.get_user_choice_and_run()
 
 if __name__ == "__main__":
     clear()

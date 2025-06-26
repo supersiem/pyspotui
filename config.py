@@ -16,8 +16,11 @@ class artists_menu:
 class artist_submenu:
     moreInfo = False
     header = "$name"
+    view = "view"
     lijstStartText = "What do you want to do?"
     askForInputText = "Choose an option: "
+    populair = "popular tracks"
+    allMusic = "all music"
 
 class playlist_menu:
     header = "Playlists"
@@ -45,6 +48,11 @@ class playback_menu:
         'albumArt',
         'progress'
     ]
+class album_tracks:
+    header = "$name"
+    lijstStartText = "Choose a track to play:"
+    askForInputText = "Choose a track: "
+
 
 class generic:
     search = 'search'
@@ -62,6 +70,12 @@ class generic:
     refresh = "refresh"
     notPlaying = "3: play"
     playing = "3: pause"
+    song = "Song"
+    album = "Album"
+    artist = "Artist"
+    songs = "Songs"
+    albums = "Albums"
+    artists = "Artists"
 
 class search_menu:
     askForQueryText = 'Enter your search query: '

@@ -35,10 +35,13 @@ class SpotifyWarper:
             return self.sp.add_to_queue(uri)
         
         def play_playlist(self, playlist_id):
-            return self.sp.start_playback(context_uri=playlist_id, device_id=self.device_id)
+            return self.sp.start_playback(context_uri=playlist_id)
         
         def play_pause(self):
             return self.sp.pause_playback() if self.get_current_playback()['is_playing'] else self.sp.start_playback()
+        
+        def play(self, uri):
+            return self.sp.start_playback(context_uri=uri)
     
     class search:
         def __init__(self, spotify_warper, device_id=None):
@@ -101,3 +104,6 @@ class SpotifyWarper:
 
         def get_playlist_tracks(self, uri, limit=20):
             return self.sp.playlist_tracks(uri, limit=limit)
+        
+        def get_artist_albums(self, uri, limit=20):
+            return self.sp.artist_albums(uri, limit=limit)
