@@ -1,46 +1,44 @@
-import main as pyspotui_actions
-
 class home:
     titel = "Startpage"
-    exittext = "Zie je later!"
+    exittext = "See you later!"
     currentlyplaying = "Currently playing"
     noSesion = "No playback session found. Please start a playback session first."
-    lijstStartText = "Wat wil je doen?"
-    askForInputText = "Kies een optie: "
+    lijstStartText = "What do you want to do?"
+    askForInputText = "Choose an option: "
     playlist = "Playlists"
     artists = "Artists"
 
 class artists_menu:
     header = "Artists"
-    lijstStartText = "Kies de artiest die je wilt bekijken of afspelen:"
-    askForInputText = "Kies een artiest: "
+    lijstStartText = "Choose the artist you want to view or play:"
+    askForInputText = "Choose an artist: "
 
 class artist_submenu:
     moreInfo = False
     header = "$name"
-    lijstStartText = "Wat wil je doen?"
-    askForInputText = "Kies een optie: "
+    lijstStartText = "What do you want to do?"
+    askForInputText = "Choose an option: "
 
 class playlist_menu:
     header = "Playlists"
-    lijstStartText = "Welk lied wil je spelen?"
-    askForInputText = "Kies een lied: "
+    lijstStartText = "Which song do you want to play?"
+    askForInputText = "Choose a song: "
 
 class playlist_submenu:
-    header = "Playlist opties"
-    lijstStartText = "Wat wil je doen?"
-    askForInputText = "Kies een optie: "
+    header = "Playlist options"
+    lijstStartText = "What do you want to do?"
+    askForInputText = "Choose an option: "
     view = "view"
 
 class playlist_tracks:
     header = "%name"
     lijstStartText = ""
-    askForInputText = "Kies een optie: "
+    askForInputText = "Choose an option: "
 
 class playback_menu:
     header = "Currently playing"
-    lijstStartText = "Wat wil je doen?"
-    askForInputText = "Kies een optie: "
+    lijstStartText = "this wil not be displayed since there is a overwrite"
+    askForInputText = "Choose an option: "
     text = '$name \n[white]$artists[/white]'
     order = [
         'text',
@@ -49,11 +47,11 @@ class playback_menu:
     ]
 
 class generic:
-    search = 'zoeken'
+    search = 'search'
     header = "please add a header to this page from the config file"
     startText = 'Choose an option:'
     askForInputText = "Enter your choice: "
-    back = 'terug'
+    back = 'back'
     play = 'play'
     skip_next = "skip next"
     skip_previous = "skip previous"
@@ -72,15 +70,15 @@ class search_menu:
     albums = 'Albums'
     artists = 'Artists'
     playlists = 'Playlists'
-    lijstStartText = 'Hoe wil je zoeken?'
-    askForInputText = 'Kies een optie: '
+    lijstStartText = 'How do you want to search?'
+    askForInputText = 'Choose an option: '
 
 class search:
     askForInputText = 'Enter your search query: '
     header = 'Search results for: $query'
     no_results = 'No results found for: $query'
-    lijstStartText = 'Dit hebben we gevonden: '
-    askForInputText = 'Kies iets: '
+    lijstStartText = 'Here is what we found: '
+    askForInputText = 'Choose something: '
 
 welkome = "Welcome to Spotify Warper! This is a command line interface for Spotify. Enjoy your stay!"
 
