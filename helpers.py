@@ -46,6 +46,8 @@ class UI:
         """Gets user choice and runs the corresponding function."""
         if menu_options is None:
             menu_options = self.menu_options
+        else:
+            self.menu_options = menu_options
         
         choice = input(self.askForInputText)
         try:
@@ -68,7 +70,7 @@ class UI:
             for keybind in self.hotkeys:
                 if choice == keybind.get('combo'):
                     if 'action' in keybind:
-                        keybind['action']()
+                        keybind['action'](self)
                     return
             rich.print("Invalid choice. Please try again.")
             self.get_user_choice_and_run(menu_options)
@@ -77,7 +79,7 @@ def hotkey_action_function_matcher(hotkeys, actions):
     """Matches hotkeys to their corresponding actions."""
     matched_actions = []
     for hotkey in hotkeys:
-        for action in actions:
+        for action in actions:  
             if hotkey['action'] == action['name']:
                 matched_actions.append({
                     'combo': hotkey['combo'],

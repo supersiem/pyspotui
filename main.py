@@ -35,9 +35,11 @@ def search_menu():
         {'name': conf.generic.back, 'function': startpage},
         {'name': conf.search_menu.songs, 'function': lambda: search_songs(query=input(conf.search.askForInputText))},
         {'name': conf.search_menu.playlists, 'function': lambda: search_playlists(query=input(conf.search.askForInputText))},
+        {'name': conf.search_menu.artists, 'function': lambda: search_artists(query=input(conf.search.askForInputText))},
+        {'name': conf.search_menu.albums, 'function': lambda: search_albums(query=input(conf.search.askForInputText))},
     ]
 
-    search_menu_ui = UI(search_options, REALhotkeys, conf.search_menu.lijstStartText, conf.search_menu.askForQueryText)
+    search_menu_ui = UI(search_options, REALhotkeys, conf.search_menu.lijstStartText, conf.search_menu.askForInputText)
     search_menu_ui.display_menu()
     search_menu_ui.get_user_choice_and_run()
 
@@ -76,6 +78,50 @@ def search_playlists(query):
                 options.append({
                     'name': playlist['name'],
                     'function': lambda p=playlist: (playlist_submenu(p['uri'], isFromSearch=True))
+                })
+
+        search_menu_ui = UI(options, REALhotkeys, conf.search.lijstStartText, conf.search.askForInputText)
+        search_menu_ui.display_menu()
+        search_menu_ui.get_user_choice_and_run()
+    else:
+        rich.print(conf.search.no_results)
+
+def search_albums(query):
+    clear()
+    header(conf.search.header.replace('$query', query))
+    options = [
+        {'name': conf.generic.back, 'function': search_menu},
+    ]
+    results = search.search_albums(query)
+    log(results)
+    if results and 'albums' in results and results['albums']['items']:
+        for album in results['albums']['items']:
+            if album and 'name' in album and 'uri' in album:  # Check if album is not None and has required fields
+                options.append({
+                    'name': album['name'],
+                    'function': lambda a=album: (album_submenu(a['uri']))
+                })
+
+        search_menu_ui = UI(options, REALhotkeys, conf.search.lijstStartText, conf.search.askForInputText)
+        search_menu_ui.display_menu()
+        search_menu_ui.get_user_choice_and_run()
+    else:
+        rich.print(conf.search.no_results)
+
+def search_artists(query):
+    clear()
+    header(conf.search.header.replace('$query', query))
+    options = [
+        {'name': conf.generic.back, 'function': search_menu},
+    ]
+    results = search.search_artists(query)
+    log(results)
+    if results and 'artists' in results and results['artists']['items']:
+        for artist in results['artists']['items']:
+            if artist and 'name' in artist and 'uri' in artist:  # Check if artist is not None and has required fields
+                options.append({
+                    'name': artist['name'],
+                    'function': lambda a=artist: (artist_submenu(a['uri']))
                 })
 
         search_menu_ui = UI(options, REALhotkeys, conf.search.lijstStartText, conf.search.askForInputText)
@@ -162,7 +208,7 @@ def playback_menu():
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Get album art URL and cache it
-    if playing and playing['item'] and playing['item']['album']['images']:
+    if playing and playing['item']['album']['images']:
         album_id = playing['item']['album']['id']
         cache_file = cache_dir / f"{album_id}.jpg"
 
@@ -176,8 +222,7 @@ def playback_menu():
                 with open(cache_file, 'wb') as f:
                     f.write(response.content)
             except requests.RequestException as e:
-                log(f"Failed to download album art: {e}")
-                rich.print("Failed to download album art.")
+                rich.print("Failed to load album art")
         else:
             os.system('timg ' + str(cache_file) if cache_file.exists() else '')
 
@@ -185,7 +230,7 @@ def playback_menu():
     output = conf.playback_menu.text.replace('$name', playing['item']['name']).replace('$artists', ', '.join(artist['name'] for artist in playing['item']['artists'])).replace('$album', playing['item']['album']['name']).replace('$duration', str(playing['item']['duration_ms'] // 1000))
     rich.print(output)
 
-    # TODO_ fix queue viewing and add volume control
+    # TODO_ add queue viewing and volume control
     options = [
         {'name': "<==", 'function': lambda: (playback.skip_to_previous(), playback_menu())},
         {'name': "==>", 'function': lambda: (playback.skip_to_next(), playback_menu())},
@@ -291,7 +336,7 @@ def artist_best_tracks(artist_id):
         rich.print(f"Genres: {', '.join(artist['genres'])}")
         rich.print(f"Popularity: {artist['popularity']}")
     options = [
-        {'name': conf.generic.back, 'function': artists_menu},
+        {'name': conf.generic.back, 'function': lambda: artist_submenu(artist_id)},
     ]
     if artistTT and 'tracks' in artistTT:
         for track in artistTT['tracks']:
@@ -309,7 +354,7 @@ def artist_best_tracks(artist_id):
 def view_album_tracks(album_id):
     clear()
     album = library.get_album(album_id)
-    header(conf.album_tracks.header.replace('%name', album['name']))
+    header(conf.album_tracks.header.replace('$name', album['name']))
     options = [
         {'name': conf.generic.back, 'function': lambda: (album_submenu(album_id))},
     ]
@@ -341,16 +386,19 @@ if __name__ == "__main__":
     rich.print("Loading...")
     spotify = spotifylib.SpotifyWarper(SECRETS.CLIENT_ID, SECRETS.CLIENT_SECRET, SECRETS.REDIRECT_URI); playback = spotify.Playback(spotify); library = spotify.Library(spotify); search = spotify.search(spotify)
     REALhotkeys = hotkey_action_function_matcher(conf.keybinds, actions=[
-        {'name': 'startpage', 'function': startpage},
-        {'name': 'playlists', 'function': playlist_menu},
-        {'name': 'currently_playing', 'function': playback_menu},
-        {'name': 'artists', 'function': artists_menu},
-        {'name': 'search', 'function': search_menu},
-        {'name': 'search_songs', 'function': lambda: search_songs(query=input(conf.search_menu.askForQueryText))},
-        # {'name': 'search_albums', 'function': lambda: search_albums(query=input(conf.search_menu.askForQueryText))},
-        # {'name': 'search_artists', 'function': lambda: search_artists(query=input(conf.search_menu.askForQueryText))},
-        {'name': 'search_playlists', 'function': lambda: search_playlists(query=input(conf.search_menu.askForQueryText))},
-        {'name': 'exit', 'function': lambda: (clear(), print(conf.home.exittext), exit(0))}
+        {'name': 'startpage', 'function': lambda self:startpage()},
+        {'name': 'playlists', 'function': lambda self:(playlist_menu())},
+        {'name': 'currently_playing', 'function': lambda self:(playback_menu())},
+        {'name': 'artists', 'function': lambda self:artists_menu()},
+        {'name': 'search', 'function': lambda self: search_menu()},
+        {'name': 'search_songs', 'function': lambda self: search_songs(query=input(conf.search.askForInputText))},
+        {'name': 'search_albums', 'function': lambda self: search_albums(query=input(conf.search.askForInputText))},
+        {'name': 'search_artists', 'function': lambda self: search_artists(query=input(conf.search.askForInputText))},
+        {'name': 'search_playlists', 'function': lambda self: search_playlists(query=input(conf.search.askForInputText))},
+        {'name': 'exit', 'function': lambda self: (clear(), print(conf.home.exittext), exit(0))},
+        {'name': 'next', 'function': lambda self: (playback.skip_to_next(), self.get_user_choice_and_run(self.menu_options))},
+        {'name': 'previous', 'function': lambda self: (playback.skip_to_previous(), self.get_user_choice_and_run(self.menu_options))},
+        {'name': 'play_pause', 'function': lambda self: (playback.play_pause(), self.get_user_choice_and_run(self.menu_options))},
     ])
     clear()
     rich.print(

@@ -78,7 +78,6 @@ class generic:
     artists = "Artists"
 
 class search_menu:
-    askForQueryText = 'Enter your search query: '
     header = 'Search'
     songs = 'Songs'
     albums = 'Albums'
@@ -92,7 +91,6 @@ class search:
     header = 'Search results for: $query'
     no_results = 'No results found for: $query'
     lijstStartText = 'Here is what we found: '
-    askForInputText = 'Choose something: '
 
 welkome = "Welcome to Spotify Warper! This is a command line interface for Spotify. Enjoy your stay!"
 
@@ -100,12 +98,21 @@ welkome = "Welcome to Spotify Warper! This is a command line interface for Spoti
 keybinds = [
     {'combo': 'h', 'action': 'startpage'},
     {'combo': 'c', 'action': 'currently_playing'},
+    {'combo': 'w', 'action': 'currently_playing'},
+    {'combo': 'test', 'action': 'currently_playing'},
     {'combo': 'p', 'action': 'playlists'},
-    {'combo': 'a', 'action': 'artists'},
+    {'combo': 'ar', 'action': 'artists'},
     {'combo': 'q', 'action': 'exit'},
     {'combo': 's', 'action': 'search'},
     {'combo': 'st', 'action': 'search_songs'},
-    # {'combo': 'sa', 'action': 'search_albums'},
+    {'combo': 'sa', 'action': 'search_albums'},
     # {'combo': 'se', 'action': 'search_artists'},
     {'combo': 'sp', 'action': 'search_playlists'},
+    {'combo': '>', 'action': 'next'},
+    {'combo': '<', 'action': 'previous'},
+    {'combo': '.', 'action': 'next'},
+    {'combo': ',', 'action': 'previous'},
+    {'combo': 'd', 'action': 'next'},
+    {'combo': 'a', 'action': 'previous'},
+    {'combo': ' ', 'action': 'play_pause'},
 ]
