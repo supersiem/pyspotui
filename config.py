@@ -106,7 +106,7 @@ keybinds = [
     {'combo': 's', 'action': 'search'},
     {'combo': 'st', 'action': 'search_songs'},
     {'combo': 'sa', 'action': 'search_albums'},
-    # {'combo': 'se', 'action': 'search_artists'},
+    {'combo': 'se', 'action': 'search_artists'},
     {'combo': 'sp', 'action': 'search_playlists'},
     {'combo': '>', 'action': 'next'},
     {'combo': '<', 'action': 'previous'},

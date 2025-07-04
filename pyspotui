@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ~/.config/pyspotui/pyspotui_venv/bin/activate
+python main.py
+deactivate
