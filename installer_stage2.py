@@ -103,11 +103,7 @@ def install():
     askForCreds()
     pip_install_and_venv()
     add_to_path()
-    print("Installation complete! You can now run the script using 'pyspotui' command.")
-    copy_to_config()
-    pip_install_and_venv()
-    add_to_path()
-    print("Installation complete! You can now run the script using 'pyspotui' command.")
+    print("Installation complete! You can now run the script using 'pyspotui' command. after restarting your terminal or sourcing your shell configuration file.")
 
 options = [
     {
