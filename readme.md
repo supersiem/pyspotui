@@ -47,7 +47,7 @@ bad code
 
 ## Roadmap
 
-- [X] full read and playback support for Spotify note: I am not sure if I missing anything, but I think I have implemented everything that is needed to read and play music from Spotify.
+- [ ] full read and playback support for Spotify
 - [X] Add support for searching for songs, albums, and artists
 - [ ] Write to Spotify playlists
 - [ ] Intagrate spotifyd to play music without the need for a Spotify client
