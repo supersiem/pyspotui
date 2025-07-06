@@ -2,6 +2,10 @@
 
 A Spotify terminal user interface written in Python.
 
+## demo
+
+If you want to try it, run demo.sh. This will create a venv, install dependencies, ask for credentials, and run the TUI. This will only work if you have Python installed. I have only tested this on macOS. Make sure you have a spotify premium account, and a active spotify client running.
+
 ## Installation
 
 Run the installer script to set up Pyspotui and its dependencies. The installer will create a virtual environment, copy necessary files to the configuration directory, and set up the environment for you to use Pyspotui:
