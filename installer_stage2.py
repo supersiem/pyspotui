@@ -20,7 +20,7 @@ def copy_to_config():
     script_path = os.path.abspath(__file__)
     
     # Files to copy
-    files_to_copy = ['config.py', 'helpers.py', 'main.py', 'spotify_warper.py', 'SECRETS.py', 'pyspotui']
+    files_to_copy = ['config.py', 'helpers.py', 'main.py', 'spotify_warper.py', 'pyspotui']
     script_dir = os.path.dirname(script_path)
     
     for file in files_to_copy:
@@ -105,6 +105,11 @@ def install():
     add_to_path()
     print("Installation complete! You can now run the script using 'pyspotui' command. after restarting your terminal or sourcing your shell configuration file.")
 
+def update():
+    copy_to_config()
+    pip_install_and_venv()
+    print("Update complete! Please restart your terminal")
+
 options = [
     {
         "name": "Install to ~/.config/pyspotui/ and add to PATH",
@@ -113,7 +118,15 @@ options = [
     {
         "name": "uninstall from ~/.config/pyspotui/",
         "function": lambda: (print("Uninstalling..."), os.system("rm -rf ~/.config/pyspotui/"), print("Uninstallation complete.")),
-    }
+    },
+    {
+        "name": "Update to latest version",
+        "function": lambda: update(),
+    },
+    {
+        "name": "Exit",
+        "function": lambda: print("Exiting..."),
+    },
 ]
 
 ui = UI(menu_options=options, hotkeys=[], startText="Welcome to the Installer!", askForInputText="Please select an option: ") 
