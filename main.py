@@ -204,7 +204,7 @@ def playback_menu():
     header(conf.playback_menu.header)
     playing = playback.get_current_playback()
     # Create cache directory if it doesn't exist
-    cache_dir = Path.home() / '.config' / 'pyspotui'
+    cache_dir = Path.home() / '.config' / 'pyspotui' / 'album_art_cache'
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Get album art URL and cache it
@@ -227,7 +227,7 @@ def playback_menu():
             os.system('timg ' + str(cache_file) if cache_file.exists() else '')
 
     # Display album art if available
-    output = conf.playback_menu.text.replace('$name', playing['item']['name']).replace('$artists', ', '.join(artist['name'] for artist in playing['item']['artists'])).replace('$album', playing['item']['album']['name']).replace('$duration', str(playing['item']['duration_ms'] // 1000))
+    output = conf.playback_menu.text.replace('$name', playing['item']['name']).replace('$artists', ', '.join(artist['name'] for artist in playing['item']['artists'])).replace('$album', playing['item']['album']['name']).replace('$duration', str(playing['item']['duration_ms'] // 1000)).replace('$volume', str(playback.volume()))
     rich.print(output)
 
     # TODO_ add queue viewing and volume control
@@ -235,23 +235,49 @@ def playback_menu():
         {'name': "<==", 'function': lambda: (playback.skip_to_previous(), playback_menu())},
         {'name': "==>", 'function': lambda: (playback.skip_to_next(), playback_menu())},
         {'name': "play/pause", 'function': lambda: (playback.play_pause(), playback_menu())},
-        # {'name': 'queue', 'function': lambda: (printQueue(), playback_menu())},
-        # {'name': "set volume", 'function': lambda: set_volume_menu()},
-        # {'name': "add to queue", 'function': lambda: add_to_queue_menu()},
         {'name': conf.generic.refresh, 'function': lambda: (playback_menu())},
+        {'name': None, 'function': lambda: (volume_control())},
         {'name': conf.generic.back, 'function': startpage},
     ]
     playback_menu_ui = UI(options, REALhotkeys)
-    rich.print('1: <==  2: ==>')
-    log(playing)
+    rich.print(conf.playback_menu.print)
     if playing and not playing['is_playing']:
         rich.print(conf.generic.notPlaying)  # Play icon when not playing
     elif playing:
         rich.print(conf.generic.playing)  # Pause icon when playing
-    rich.print('4: refresh')
-    rich.print('5: terug')
     # playback_menu_ui.display_menu()
     playback_menu_ui.get_user_choice_and_run()
+
+def volume_control():
+    volume = playback.volume()
+    clear()
+    header(conf.volume_control.header)
+    options = [
+        {'name': conf.generic.back, 'function': playback_menu},
+        {'name': conf.volume_control.increase, 'function': lambda: (playback.set_volume(min(volume + conf.volume_control.change, 100)), volume_control())},
+        {'name': conf.volume_control.decrease, 'function': lambda: (playback.set_volume(min(volume - conf.volume_control.change, 100)), volume_control())},
+        {'name': conf.volume_control.setVolume, 'function': lambda: (set_volume_safely() , volume_control())},
+        ]
+    if volume == 0:
+        options.append({'name': conf.volume_control.unmute, 'function': lambda: (playback.set_volume(100), volume_control())})
+    else:
+        options.append({'name': conf.volume_control.mute, 'function': lambda: (playback.set_volume(0), volume_control())})
+    volume_ui = UI(options, REALhotkeys, conf.volume_control.lijstStartText, conf.volume_control.askForInputText)
+    volume_ui.display_menu()
+    volume_ui.get_user_choice_and_run()
+
+def set_volume_safely():
+    try:
+        new_volume = int(input(conf.volume_control.askForVolumeText))
+        if 0 <= new_volume <= 100:
+            playback.set_volume(new_volume)
+        else:
+            rich.print("Volume must be between 0 and 100.")
+    except ValueError:
+        rich.print("Invalid input. Please enter a number between 0 and 100.")
+    except Exception as e:
+        rich.print(f"An error occurred while setting the volume: {e}")
+    
 
 def artists_menu():
     clear()

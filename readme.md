@@ -51,6 +51,7 @@ bad code
 - [X] Add support for searching for songs, albums, and artists
 - [ ] Write to Spotify playlists
 - [ ] Intagrate spotifyd to play music without the need for a Spotify client
-- [ ] MORE CONFIGURATION OPTIONS. 119 LINES IS NOT ENOUGH!!!
+- [ ] MORE CONFIGURATION OPTIONS. 119 LINES OF CONFIG IS NOT ENOUGH!!!
+- [ ] Document `config.py`
   
 bye!

@@ -13,6 +13,18 @@ class artists_menu:
     lijstStartText = "Choose the artist you want to view or play:"
     askForInputText = "Choose an artist: "
 
+class volume_control:
+    header = "Volume Control"
+    lijstStartText = "Choose an option:"
+    askForInputText = "Enter your choice: "
+    askForVolumeText = "Enter the volume level (0-100): "
+    increase = "Increase Volume"
+    decrease = "Decrease Volume"
+    mute = "Mute Volume"
+    unmute = "Unmute Volume"
+    change = 10
+    setVolume = "Set Volume"
+
 class artist_submenu:
     moreInfo = False
     header = "$name"
@@ -39,10 +51,11 @@ class playlist_tracks:
     askForInputText = "Choose an option: "
 
 class playback_menu:
+    print = "1. skip previous  2. skip next\n3. play/pause\n4. refresh\n5. change volume\n6. back "
     header = "Currently playing"
     lijstStartText = "this wil not be displayed since there is a overwrite"
     askForInputText = "Choose an option: "
-    text = '$name \n[white]$artists[/white]'
+    text = '$name \n[white]$artists[/white] \n[green]$volume%[/green]'
     order = [
         'text',
         'albumArt',
@@ -92,7 +105,7 @@ class search:
     no_results = 'No results found for: $query'
     lijstStartText = 'Here is what we found: '
 
-welkome = "Welcome to Spotify Warper! This is a command line interface for Spotify. Enjoy your stay!"
+welkome = "Welcome to Pyspotui!"
 
 
 keybinds = [
