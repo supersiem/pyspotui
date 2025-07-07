@@ -1,9 +1,25 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import CacheFileHandler
+import os
+from pathlib import Path
 
 class SpotifyWarper:
     def __init__(self, client_id, client_secret, redirect_uri, scope='user-read-playback-state,user-modify-playback-state,user-library-read,user-library-modify,playlist-read-private,playlist-modify-private,playlist-modify-public,playlist-read-collaborative,user-read-private,user-follow-read'):
-        self.sp = spotipy.Spotify(client_credentials_manager=SpotifyOAuth(scope=scope, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri))
+        cache_path = os.path.expanduser('~/.config/pyspotui/cache')
+        cache_dir = os.path.dirname(cache_path)
+        Path(cache_dir).mkdir(parents=True, exist_ok=True)
+        
+        handeler = CacheFileHandler(cache_path=cache_path)
+        self.sp = spotipy.Spotify(
+            client_credentials_manager=SpotifyOAuth(
+                scope=scope, 
+                client_id=client_id, 
+                client_secret=client_secret,
+                redirect_uri=redirect_uri, 
+                cache_handler=handeler
+            )
+        )
 
     def get_devices(self):
         return self.sp.devices()
